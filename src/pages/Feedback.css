@@ -1,0 +1,239 @@
+.feedback-container {
+    max-width: 1000px;
+    margin: 2rem auto;
+    padding: 0 var(--space-lg);
+}
+
+.feedback-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.feedback-header h1 {
+    font-size: 2.25rem;
+    margin-bottom: 0.75rem;
+}
+
+.feedback-status {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: 0.5rem 1rem;
+    background: rgba(16, 185, 129, 0.1);
+    border-radius: 20px;
+    color: var(--accent);
+    font-weight: 500;
+    font-size: 0.9375rem;
+}
+
+.scores-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.25rem;
+    margin-bottom: 2.5rem;
+}
+
+.score-card {
+    background: var(--bg-primary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.score-card:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--primary);
+}
+
+.score-card.score-accent:before {
+    background: var(--accent);
+}
+
+.score-label {
+    font-size: 0.9375rem;
+    color: var(--text-secondary);
+    margin-bottom: var(--space-md);
+    font-weight: 500;
+}
+
+.score-circle {
+    width: 100px;
+    height: 100px;
+    margin: 0 auto var(--space-md);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    background: var(--bg-tertiary);
+    border: 4px solid var(--primary);
+}
+
+.score-card.score-accent .score-circle {
+    border-color: var(--accent);
+}
+
+.score-value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.score-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary);
+}
+
+.score-card.score-accent .score-icon {
+    color: var(--accent);
+}
+
+.feedback-sections {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--space-lg);
+    margin-bottom: 2.5rem;
+}
+
+.feedback-section {
+    padding: 2rem;
+}
+
+.section-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: var(--space-md);
+}
+
+.section-icon.success {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--accent);
+}
+
+.section-icon.warning {
+    background: rgba(245, 158, 11, 0.1);
+    color: var(--warning);
+}
+
+.feedback-section h3 {
+    font-size: 1.25rem;
+    margin-bottom: var(--space-lg);
+}
+
+.feedback-list {
+    list-style: none;
+    padding: 0;
+}
+
+.feedback-list li {
+    padding: 0.75rem 0;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: start;
+    gap: var(--space-sm);
+    line-height: 1.5;
+    border-bottom: 1px solid var(--border);
+}
+
+.feedback-list li:last-child {
+    border-bottom: none;
+}
+
+.feedback-list li:before {
+    content: "•";
+    color: var(--primary);
+    font-weight: bold;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+}
+
+.next-steps {
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+.next-steps h3 {
+    font-size: 1.25rem;
+    margin-bottom: var(--space-lg);
+}
+
+.next-steps-grid {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+}
+
+.next-step-item {
+    display: flex;
+    gap: var(--space-md);
+    align-items: start;
+}
+
+.step-number {
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    background: var(--primary);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1rem;
+}
+
+.step-content h4 {
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+    color: var(--text-primary);
+}
+
+.step-content p {
+    font-size: 0.9375rem;
+    color: var(--text-secondary);
+}
+
+.feedback-actions {
+    display: flex;
+    gap: var(--space-md);
+    justify-content: center;
+    margin-top: 2rem;
+}
+
+@media (max-width: 768px) {
+    .feedback-header h1 {
+        font-size: 1.75rem;
+    }
+
+    .scores-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .feedback-sections {
+        grid-template-columns: 1fr;
+    }
+
+    .feedback-actions {
+        flex-direction: column-reverse;
+    }
+
+    .feedback-actions .btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
