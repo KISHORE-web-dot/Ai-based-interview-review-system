@@ -15,7 +15,11 @@ load_dotenv()
 app = FastAPI(title="AI Interview Backend", version="1.0.0")
 
 # CORS Configuration
-origins = ["*"]
+origins = [
+    "http://localhost:3000",
+    "http://localhost:5173",
+    "https://ai-based-interview-review-system.vercel.app"
+]
 
 app.add_middleware(
     CORSMiddleware,
