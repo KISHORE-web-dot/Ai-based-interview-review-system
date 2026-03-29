@@ -6,7 +6,12 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Format: mysql+pymysql://user:password@host/db_name
-DATABASE_URL = os.getenv("DATABASE_URL", "mysql+pymysql://root:password@localhost/interview_db")
+raw_url = os.getenv("DATABASE_URL", "mysql+pymysql://root:password@localhost/interview_db")
+
+if raw_url.startswith("mysql://"):
+    raw_url = raw_url.replace("mysql://", "mysql+pymysql://", 1)
+
+DATABASE_URL = raw_url
 
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
