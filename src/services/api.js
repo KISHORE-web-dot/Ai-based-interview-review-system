@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:8000/api';
+const API_BASE_URL = import.meta.env.PROD ? 'https://ai-based-interview-review-system-production.up.railway.app/api' : 'http://localhost:8000/api';
 
 export const api = {
     // Resume
