@@ -11,25 +11,35 @@ async def get_dashboard_stats(db: Session = Depends(get_db)):
     # Total Interviews
     total_interviews = db.query(Interview).count()
     
-    # Average Scores
-    avg_scores = db.query(
-        func.avg(Feedback.confidence_score).label("confidence"),
-        func.avg(Feedback.communication_score).label("communication"),
-        func.avg(Feedback.technical_score).label("technical"),
-        func.avg(Feedback.stress_handling_score).label("stress")
-    ).first()
+    # Get the Last 5 Feedbacks for a highly responsive moving average
+    recent_feedbacks = db.query(Feedback).order_by(Feedback.id.desc()).limit(5).all()
     
-    # Format response (handle None if no data)
+    # Format response with auto-scaling (convert 0-10 to 0-100 percentage)
     def format_score(score):
-        return int(score) if score else 0
+        if not score: return 0
+        val = float(score)
+        return int(val * 10) if val <= 10 else int(val)
         
+    if not recent_feedbacks:
+        return {
+            "totalInterviews": total_interviews,
+            "scores": { "confidence": 0, "communication": 0, "technical": 0, "stress": 0 },
+            "trends": { "confidence": "+0%", "communication": "+0%" }
+        }
+        
+    # Calculate responsive averages
+    avg_conf = sum(f.confidence_score or 0 for f in recent_feedbacks) / len(recent_feedbacks)
+    avg_comm = sum(f.communication_score or 0 for f in recent_feedbacks) / len(recent_feedbacks)
+    avg_tech = sum(f.technical_score or 0 for f in recent_feedbacks) / len(recent_feedbacks)
+    avg_stress = sum(f.stress_handling_score or 0 for f in recent_feedbacks) / len(recent_feedbacks)
+
     return {
         "totalInterviews": total_interviews,
         "scores": {
-            "confidence": format_score(avg_scores.confidence),
-            "communication": format_score(avg_scores.communication),
-            "technical": format_score(avg_scores.technical),
-            "stress": format_score(avg_scores.stress)
+            "confidence": format_score(avg_conf),
+            "communication": format_score(avg_comm),
+            "technical": format_score(avg_tech),
+            "stress": format_score(avg_stress)
         },
         # Mock trend for now (could be calculated from last 2 vs previous)
         "trends": {
