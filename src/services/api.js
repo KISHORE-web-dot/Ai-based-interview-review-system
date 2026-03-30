@@ -72,6 +72,16 @@ export const api = {
         }
     },
 
+    analyzeDashboardPerformance: async () => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/dashboard/analyze`);
+            return await response.json();
+        } catch (error) {
+            console.error('API Error:', error);
+            throw error;
+        }
+    },
+
     // Auth
     login: async (username, password) => {
         const params = new URLSearchParams();

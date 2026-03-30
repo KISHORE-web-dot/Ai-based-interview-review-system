@@ -314,3 +314,29 @@ def analyze_body_language(frames_base64: list) -> dict:
     except Exception as e:
         print(f"Body language analysis error: {e}")
         return {"body_language_score": None, "body_language_feedback": "Failed to analyze body language or rate limit exceeded."}
+
+def generate_trend_analysis(feedbacks: list) -> str:
+    """Analyze the user's performance trends over time using past feedback records."""
+    if not feedbacks:
+        return "Not enough data for a trend analysis. Complete a few interviews to activate the AI Analyst!"
+        
+    prompt = f"""
+    You are an expert AI Career Coach. Analyze the user's interview history over their last {len(feedbacks)} sessions.
+    
+    Here is the JSON history data:
+    {json.dumps(feedbacks, indent=2)[:3000]}
+    
+    Write a warm, deeply personalized, 3-to-4 sentence summary of their growth trajectory. 
+    Point out any specific areas they have improved on or areas they are consistently struggling with.
+    Make it highly encouraging and actionable. Do NOT use markdown. Start directly with the summary.
+    """
+    
+    try:
+        response = client.models.generate_content(
+            model='models/gemini-2.5-flash', contents=prompt
+        )
+        return response.text.replace("```", "").strip()
+    except Exception as e:
+        print(f"Error generating trend analysis: {e}")
+        return "I'm having trouble analyzing your history right now, but your data looks great. Keep practicing!"
+

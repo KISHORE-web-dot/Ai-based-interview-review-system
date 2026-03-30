@@ -1,8 +1,10 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from sqlalchemy import func
+import json
 from config.database import get_db
 from models.db_models import Interview, Feedback
+from services.ai_service import generate_trend_analysis
 
 router = APIRouter()
 
@@ -47,3 +49,30 @@ async def get_dashboard_stats(db: Session = Depends(get_db)):
             "communication": "+5%"
         }
     }
+
+@router.get("/analyze")
+async def analyze_dashboard_performance(db: Session = Depends(get_db)):
+    """Fetch recent feedbacks and generate an AI agent summary of the user's performance."""
+    # Get last 4 feedbacks
+    recent_feedbacks = db.query(Feedback).order_by(Feedback.id.desc()).limit(4).all()
+    
+    if not recent_feedbacks:
+        return {"analysis": "Take a few interviews first so I can analyze your unique strengths and growth!"}
+        
+    # Extract only essential JSON tracking datums to prevent token bloat
+    trimmed_data = []
+    for f in recent_feedbacks:
+        try:
+            raw = f.analysis_data
+            parsed = json.loads(raw) if isinstance(raw, str) else raw
+            trimmed_data.append({
+                "date": f.created_at.strftime("%Y-%m-%d"),
+                "scores": parsed.get("scores", {}),
+                "weaknesses": parsed.get("weaknesses", [])
+            })
+        except:
+            pass
+            
+    summary = generate_trend_analysis(trimmed_data)
+    
+    return {"analysis": summary}
