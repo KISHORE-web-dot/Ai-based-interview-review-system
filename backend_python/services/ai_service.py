@@ -194,12 +194,19 @@ def generate_final_feedback(qa_list: list) -> dict:
         "strengths": ["strength 1", "strength 2", "strength 3"],
         "weaknesses": ["weakness 1", "weakness 2"],
         "next_steps": ["actionable step 1", "actionable step 2", "actionable step 3"],
-        "overall_score": 7,
+        "scores": {{
+            "Confidence": 85,
+            "Communication": 78,
+            "Technical Skills": 92,
+            "Stress Handling": 88
+        }},
+        "overall_score": 85,
         "detailed_analysis": "Comprehensive analysis paragraph"
     }}
     
     Rules:
-    - overall_score should be 0-10
+    - All scores in the 'scores' object and 'overall_score' MUST be precise integers between 1 and 100.
+    - Carefully calculate differences (e.g., strong tech answer = high tech score, but poor grammar = lower communication score).
     - Provide 2-4 strengths and weaknesses
     - Give 3-4 specific, actionable next steps
     - Write a detailed 2-3 sentence analysis
@@ -213,25 +220,29 @@ def generate_final_feedback(qa_list: list) -> dict:
         feedback = json.loads(text)
         
         # Validate required fields
-        required_fields = ["strengths", "weaknesses", "next_steps", "overall_score", "detailed_analysis"]
+        required_fields = ["strengths", "weaknesses", "next_steps", "scores", "overall_score", "detailed_analysis"]
         for field in required_fields:
             if field not in feedback:
                 raise ValueError(f"Missing required field: {field}")
         
-        # Ensure overall_score is an integer between 0-10
-        feedback["overall_score"] = max(0, min(10, int(feedback.get("overall_score", 5))))
+        # Ensure scores are valid 1-100 integers
+        for k in feedback["scores"]:
+            feedback["scores"][k] = max(0, min(100, int(feedback["scores"][k])))
+            
+        feedback["overall_score"] = max(0, min(100, int(feedback.get("overall_score", 50))))
         
         return feedback
         
     except Exception as e:
         print(f"Error generating final feedback: {e}")
-        # Return fallback feedback
-        avg_score = 5
+        # Return fallback feedback with default 50/100 scores
+        avg_score = 50
         if qa_list:
-            # Try to calculate average from analysis if available
+            # Try to calculate average from AI micro-analysis if available
             scores = [qa.get("analysis", {}).get("score", 5) for qa in qa_list if qa.get("analysis")]
             if scores:
-                avg_score = int(sum(scores) / len(scores))
+                # Assuming analysis returned score out of 10, scale to 100
+                avg_score = int((sum(scores) / len(scores)) * 10)
         
         return {
             "strengths": [
@@ -247,6 +258,12 @@ def generate_final_feedback(qa_list: list) -> dict:
                 "Practice the STAR method for behavioral questions",
                 "Take another mock interview to track improvement"
             ],
+            "scores": {
+                "Confidence": avg_score,
+                "Communication": avg_score,
+                "Technical Skills": avg_score,
+                "Stress Handling": avg_score
+            },
             "overall_score": avg_score,
             "detailed_analysis": f"Based on {len(qa_list)} questions answered, you demonstrated basic competency. Focus on expanding your answers with specific examples and more technical depth to improve your performance."
         }

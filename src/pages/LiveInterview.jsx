@@ -249,7 +249,7 @@ const LiveInterview = () => {
             }, 3000);
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [timer, setupData.duration, isTimeUp, navigate, setupData.sessionId]);
+    }, [timer, setupData.duration, isTimeUp, navigate, setupData.sessionId, qaList]);
 
     const formatTime = (seconds) => {
         const mins = Math.floor(seconds / 60);

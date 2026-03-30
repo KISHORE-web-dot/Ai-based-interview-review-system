@@ -63,9 +63,9 @@ const Feedback = () => {
     if (!feedbackData) return null;
 
     const scores = [
-        { label: 'Confidence', score: feedbackData.overall_score * 10 || 0, icon: <Brain size={20} />, color: 'primary' },
-        { label: 'Communication', score: feedbackData.overall_score * 10 || 0, icon: <MessageSquare size={20} />, color: 'accent' }, // Using overall for now as mock mapping
-        { label: 'Technical Skills', score: feedbackData.overall_score * 10 || 0, icon: <Target size={20} />, color: 'primary' }
+        { label: 'Confidence', score: feedbackData.scores?.Confidence || feedbackData.overall_score || 0, icon: <Brain size={20} />, color: 'primary' },
+        { label: 'Communication', score: feedbackData.scores?.Communication || feedbackData.overall_score || 0, icon: <MessageSquare size={20} />, color: 'accent' },
+        { label: 'Technical Skills', score: feedbackData.scores?.["Technical Skills"] || feedbackData.scores?.Technical || feedbackData.overall_score || 0, icon: <Target size={20} />, color: 'primary' }
     ];
 
     if (feedbackData.body_language_score !== undefined && feedbackData.body_language_score !== null) {
@@ -77,7 +77,7 @@ const Feedback = () => {
         });
     }
 
-    scores.push({ label: 'Overall Score', score: feedbackData.overall_score * 10 || 0, icon: <Award size={20} />, color: 'accent' });
+    scores.push({ label: 'Overall Score', score: feedbackData.overall_score || 0, icon: <Award size={20} />, color: 'accent' });
 
 
     return (
