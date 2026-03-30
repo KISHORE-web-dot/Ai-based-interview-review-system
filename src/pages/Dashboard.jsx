@@ -9,8 +9,6 @@ import './Dashboard.css';
 const Dashboard = () => {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
-    const [aiAnalysis, setAiAnalysis] = useState("");
-    const [loadingAnalysis, setLoadingAnalysis] = useState(false);
     const [statsData, setStatsData] = useState({
         totalInterviews: 0,
         scores: {
@@ -79,19 +77,6 @@ const Dashboard = () => {
         }
     };
 
-    const handleAskAi = async () => {
-        setLoadingAnalysis(true);
-        try {
-            const result = await api.analyzeDashboardPerformance();
-            setAiAnalysis(result.analysis);
-        } catch (err) {
-            console.error(err);
-            setAiAnalysis("Sorry, I'm having trouble connecting to the analysis server right now.");
-        } finally {
-            setLoadingAnalysis(false);
-        }
-    };
-
     if (loading) {
         return (
             <div className="dashboard-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
@@ -135,7 +120,7 @@ const Dashboard = () => {
                     <p className="section-subtitle">Your progress over the last 30 days</p>
                 </div>
 
-                <div className="stats-grid" style={{ marginBottom: '2rem' }}>
+                <div className="stats-grid">
                     {stats.map((stat, index) => (
                         <Card key={index} className="stat-card">
                             <div className="stat-icon">{stat.icon}</div>
@@ -149,45 +134,6 @@ const Dashboard = () => {
                             )}
                         </Card>
                     ))}
-                </div>
-
-                <div className="ai-analyst-section">
-                    <Card style={{ backgroundColor: 'var(--bg-tertiary)', border: '1px solid var(--primary)', position: 'relative', overflow: 'hidden' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem', color: 'var(--primary)' }}>
-                            <Brain size={24} />
-                            <h3 style={{ margin: 0 }}>AI Performance Analyst</h3>
-                        </div>
-                        
-                        {!aiAnalysis && !loadingAnalysis && (
-                            <div style={{ padding: '1rem 0' }}>
-                                <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem', lineHeight: 1.5 }}>
-                                    Want to know how you're progressing? Connect your AI Agent to scan your recent interview history and synthesize your growth trajectory, identifying hidden patterns in your performance.
-                                </p>
-                                <Button onClick={handleAskAi} variant="primary">
-                                    <Brain size={18} style={{ marginRight: '0.5rem' }}/>
-                                    Connect AI Agent
-                                </Button>
-                            </div>
-                        )}
-
-                        {loadingAnalysis && (
-                            <div style={{ padding: '2rem 0', display: 'flex', alignItems: 'center', gap: '1rem', color: 'var(--primary)' }}>
-                                <Loader2 size={24} className="animate-spin" />
-                                <span>Agent is analyzing recent sessions...</span>
-                            </div>
-                        )}
-
-                        {aiAnalysis && !loadingAnalysis && (
-                            <div style={{ padding: '1rem 0', animation: 'fadeIn 0.5s ease' }}>
-                                <p style={{ lineHeight: 1.6, color: 'var(--text-primary)', fontSize: '1.05rem', borderLeft: '3px solid var(--primary)', paddingLeft: '1rem', fontStyle: 'italic' }}>
-                                    "{aiAnalysis}"
-                                </p>
-                                <Button onClick={handleAskAi} variant="outline" style={{ marginTop: '1.5rem', fontSize: '0.9rem' }}>
-                                    Refresh Analysis
-                                </Button>
-                            </div>
-                        )}
-                    </Card>
                 </div>
             </div>
         </div>

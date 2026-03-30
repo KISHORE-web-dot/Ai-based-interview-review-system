@@ -9,7 +9,7 @@ const LiveInterview = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const setupData = location.state || {};
-    const interviewType = setupData.type || 'voice'; // voice, panel, stress
+    const interviewType = setupData.interviewType || setupData.type || 'voice'; // voice, panel, stress
 
     // Interview type configurations
     const INTERVIEW_CONFIGS = {
@@ -356,11 +356,13 @@ const LiveInterview = () => {
 
         try {
             const feedback = await api.analyzeAnswer(currentQ, answerText);
+            const feedbackText = feedback?.feedback || 'Your answer was recorded successfully.';
+            const feedbackScore = Number.isFinite(Number(feedback?.score)) ? Number(feedback.score) : 0;
 
             // Add Feedback to UI (as system message)
             setMessages(prev => [...prev, {
                 sender: 'AI Feedback',
-                text: `${feedback.feedback} (Score: ${feedback.score}/10)`,
+                text: `${feedbackText} (Score: ${feedbackScore}/10)`,
                 type: 'system'
             }]);
 
@@ -409,7 +411,7 @@ const LiveInterview = () => {
                 const nextIndex = currentQuestionIndex + 1;
                 if (nextIndex < questions.length) {
                     setCurrentQuestionIndex(nextIndex);
-                    speak(questions[nextIndex].text, nextIndex % 3);
+                    speak(questions[nextIndex].text, interviewType === 'panel' ? nextIndex % 3 : 0);
                 } else {
                     handleEndInterview();
                 }

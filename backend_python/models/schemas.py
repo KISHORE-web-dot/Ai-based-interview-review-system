@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 class ResumeResponse(BaseModel):
     text: str
@@ -15,6 +15,8 @@ class InterviewStartRequest(BaseModel):
 class Question(BaseModel):
     id: int
     text: str
+    interviewer: Optional[str] = None
+    timeLimit: Optional[int] = None
     
 class InterviewSession(BaseModel):
     session_id: str
@@ -44,6 +46,7 @@ class FinalFeedbackResponse(BaseModel):
     strengths: List[str]
     weaknesses: List[str]
     next_steps: List[str]
+    scores: Dict[str, int]
     overall_score: int
     detailed_analysis: str
     body_language_score: Optional[int] = None

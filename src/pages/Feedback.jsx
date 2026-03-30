@@ -15,6 +15,13 @@ const Feedback = () => {
     const [feedbackData, setFeedbackData] = useState(null);
     const [error, setError] = useState(null);
 
+    const normalizeList = (value, fallback) => {
+        if (Array.isArray(value) && value.length > 0) {
+            return value;
+        }
+        return fallback;
+    };
+
     useEffect(() => {
         const generateFeedback = async () => {
             if (!sessionId || !qaList) {
@@ -28,7 +35,7 @@ const Feedback = () => {
                 setFeedbackData(data);
             } catch (err) {
                 console.error("Feedback error:", err);
-                setError("Failed to generate feedback. Please try again.");
+                setError(err.message || "Failed to generate feedback. Please try again.");
             } finally {
                 setLoading(false);
             }
@@ -62,22 +69,46 @@ const Feedback = () => {
 
     if (!feedbackData) return null;
 
+    const strengths = normalizeList(feedbackData.strengths, [
+        'You completed the interview flow and submitted your responses.',
+        'You stayed engaged through the practice session.'
+    ]);
+
+    const weaknesses = normalizeList(feedbackData.weaknesses, [
+        'More detailed examples would make your answers stronger.',
+        'Practice structuring answers more clearly before the next attempt.'
+    ]);
+
+    const nextSteps = normalizeList(feedbackData.next_steps, [
+        'Practice another round and focus on concise, example-driven answers.',
+        'Review common interview questions and prepare STAR-based responses.',
+        'Work on posture, pace, and clarity during spoken answers.'
+    ]);
+
+    const overallScore = Number.isFinite(Number(feedbackData.overall_score)) ? Number(feedbackData.overall_score) : 0;
+    const getScore = (...values) => {
+        const valid = values
+            .map((value) => Number(value))
+            .find((value) => Number.isFinite(value));
+        return valid ?? overallScore;
+    };
+
     const scores = [
-        { label: 'Confidence', score: feedbackData.scores?.Confidence || feedbackData.overall_score || 0, icon: <Brain size={20} />, color: 'primary' },
-        { label: 'Communication', score: feedbackData.scores?.Communication || feedbackData.overall_score || 0, icon: <MessageSquare size={20} />, color: 'accent' },
-        { label: 'Technical Skills', score: feedbackData.scores?.["Technical Skills"] || feedbackData.scores?.Technical || feedbackData.overall_score || 0, icon: <Target size={20} />, color: 'primary' }
+        { label: 'Confidence', score: getScore(feedbackData.scores?.Confidence), icon: <Brain size={20} />, color: 'primary' },
+        { label: 'Communication', score: getScore(feedbackData.scores?.Communication), icon: <MessageSquare size={20} />, color: 'accent' },
+        { label: 'Technical Skills', score: getScore(feedbackData.scores?.["Technical Skills"], feedbackData.scores?.Technical, feedbackData.scores?.["Technical Knowledge"]), icon: <Target size={20} />, color: 'primary' }
     ];
 
     if (feedbackData.body_language_score !== undefined && feedbackData.body_language_score !== null) {
         scores.push({
             label: 'Body Language',
-            score: feedbackData.body_language_score * 10,
+            score: Number(feedbackData.body_language_score) <= 10 ? Number(feedbackData.body_language_score) * 10 : Number(feedbackData.body_language_score),
             icon: <Camera size={20} />,
             color: 'accent'
         });
     }
 
-    scores.push({ label: 'Overall Score', score: feedbackData.overall_score || 0, icon: <Award size={20} />, color: 'accent' });
+    scores.push({ label: 'Overall Score', score: overallScore, icon: <Award size={20} />, color: 'accent' });
 
 
     return (
@@ -109,9 +140,9 @@ const Feedback = () => {
                     </div>
                     <h3>Key Strengths</h3>
                     <ul className="feedback-list">
-                        {feedbackData.strengths?.map((strength, index) => (
+                        {strengths.map((strength, index) => (
                             <li key={index}>{strength}</li>
-                        )) || <li>No specific strengths identified.</li>}
+                        ))}
                     </ul>
                 </Card>
 
@@ -121,9 +152,9 @@ const Feedback = () => {
                     </div>
                     <h3>Areas for Improvement</h3>
                     <ul className="feedback-list">
-                        {feedbackData.weaknesses?.map((weakness, index) => (
+                        {weaknesses.map((weakness, index) => (
                             <li key={index}>{weakness}</li>
-                        )) || <li>No specific improvements identified.</li>}
+                        ))}
                     </ul>
                 </Card>
                 
@@ -141,9 +172,9 @@ const Feedback = () => {
             </div>
 
             <Card className="next-steps">
-                <h3>Recommended Next Steps</h3>
+                    <h3>Recommended Next Steps</h3>
                 <div className="next-steps-grid">
-                    {feedbackData.next_steps?.map((step, index) => (
+                    {nextSteps.map((step, index) => (
                         <div className="next-step-item" key={index}>
                             <div className="step-number">{index + 1}</div>
                             <div className="step-content">

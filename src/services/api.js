@@ -1,5 +1,25 @@
 const API_BASE_URL = import.meta.env.PROD ? 'https://ai-based-interview-review-system-production.up.railway.app/api' : 'http://localhost:8000/api';
 
+const parseJsonResponse = async (response) => {
+    let data = null;
+
+    try {
+        data = await response.json();
+    } catch (error) {
+        if (!response.ok) {
+            throw new Error(`Request failed with status ${response.status}`);
+        }
+        return null;
+    }
+
+    if (!response.ok) {
+        const message = data?.detail || data?.message || `Request failed with status ${response.status}`;
+        throw new Error(message);
+    }
+
+    return data;
+};
+
 export const api = {
     // Resume
     uploadResume: async (file) => {
@@ -11,7 +31,7 @@ export const api = {
                 method: 'POST',
                 body: formData,
             });
-            return await response.json();
+            return await parseJsonResponse(response);
         } catch (error) {
             console.error('API Error:', error);
             throw error;
@@ -27,7 +47,7 @@ export const api = {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data),
             });
-            return await response.json();
+            return await parseJsonResponse(response);
         } catch (error) {
             console.error('API Error:', error);
             throw error;
@@ -41,7 +61,7 @@ export const api = {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ question, answer }),
             });
-            return await response.json();
+            return await parseJsonResponse(response);
         } catch (error) {
             console.error('API Error:', error);
             throw error;
@@ -55,7 +75,7 @@ export const api = {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ session_id: sessionId, qa_list, frames }),
             });
-            return await response.json();
+            return await parseJsonResponse(response);
         } catch (error) {
             console.error('API Error:', error);
             throw error;
@@ -65,7 +85,7 @@ export const api = {
     getDashboardStats: async () => {
         try {
             const response = await fetch(`${API_BASE_URL}/dashboard/stats`);
-            return await response.json();
+            return await parseJsonResponse(response);
         } catch (error) {
             console.error('API Error:', error);
             throw error;
@@ -75,7 +95,7 @@ export const api = {
     analyzeDashboardPerformance: async () => {
         try {
             const response = await fetch(`${API_BASE_URL}/dashboard/analyze`);
-            return await response.json();
+            return await parseJsonResponse(response);
         } catch (error) {
             console.error('API Error:', error);
             throw error;
