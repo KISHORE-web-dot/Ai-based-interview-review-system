@@ -159,7 +159,7 @@ const Feedback = () => {
                 <Button variant="secondary" onClick={() => navigate('/dashboard')}>
                     Back to Dashboard
                 </Button>
-                <Button variant="primary" size="large" onClick={() => navigate('/setup')}>
+                <Button variant="primary" size="large" onClick={() => navigate('/upload')}>
                     Practice Again
                 </Button>
             </div>
