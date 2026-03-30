@@ -38,7 +38,17 @@ if start_result and "session_id" in start_result:
     print("\n--- Testing /interview/end ---")
     end_data = {
         "session_id": start_result["session_id"],
-        "qa_list": [],
+        "qa_list": [
+            {
+                "question": "What is Python?",
+                "answer": "Python is a programming language.",
+                "analysis": {
+                    "feedback": "Good.",
+                    "score": 8,
+                    "suggestions": []
+                }
+            }
+        ],
         "frames": []
     }
 
