@@ -75,7 +75,7 @@ async def end_interview(request: FinalFeedbackRequest, db: Session = Depends(get
             communication_score=scores.get("Communication", feedback_data.get("overall_score", 50)),
             technical_score=scores.get("Technical Knowledge", feedback_data.get("overall_score", 50)),
             stress_handling_score=scores.get("Stress Handling", feedback_data.get("overall_score", 50)),
-            analysis_data=str(feedback_data)  # Store as JSON string
+            analysis_data=feedback_data  # SQLAlchemy JSON type handles dict serialization
         )
         
         db.add(new_feedback)

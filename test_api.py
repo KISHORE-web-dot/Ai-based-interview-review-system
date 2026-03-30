@@ -1,15 +1,47 @@
 import urllib.request
 import json
 import urllib.error
+import uuid
 
-data = json.dumps({'full_name': 'Test User', 'email': 'test_user_sql@example.com', 'password': 'password123'}).encode()
-req = urllib.request.Request('https://ai-based-interview-review-system-production.up.railway.app/api/auth/register', data=data, headers={'Content-Type': 'application/json'})
-try:
-    resp = urllib.request.urlopen(req)
-    print(f"Success: {resp.status}")
-    print(resp.read().decode())
-except urllib.error.HTTPError as e:
-    print(f"HTTPError: {e.code}")
-    print(e.read().decode())
-except Exception as e:
-    print(f"Error: {e}")
+# Base URL for local FastAPI backend
+BASE_URL = "http://localhost:8000/api"
+
+def make_request(method, endpoint, data=None):
+    url = f"{BASE_URL}{endpoint}"
+    headers = {'Content-Type': 'application/json'}
+    
+    encoded_data = None
+    if data:
+        encoded_data = json.dumps(data).encode('utf-8')
+        
+    req = urllib.request.Request(url, data=encoded_data, headers=headers, method=method)
+    try:
+        with urllib.request.urlopen(req) as response:
+            return json.loads(response.read().decode())
+    except urllib.error.HTTPError as e:
+        print(f"HTTPError: {e.code}")
+        print(e.read().decode())
+        return None
+
+# Test the /interview/end endpoint
+print("\n--- Testing /interview/end ---")
+session_id = str(uuid.uuid4())
+end_data = {
+    "session_id": session_id,
+    "qa_list": [
+        {
+            "question": "What is Python?",
+            "answer": "Python is a programming language.",
+            "analysis": {
+                "feedback": "Good.",
+                "score": 8,
+                "suggestions": []
+            }
+        }
+    ],
+    "frames": []
+}
+
+result = make_request("POST", "/interview/end", end_data)
+if result:
+    print(json.dumps(result, indent=2))
