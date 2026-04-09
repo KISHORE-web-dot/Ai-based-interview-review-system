@@ -234,7 +234,11 @@ def generate_final_feedback(qa_list: list) -> dict:
         return feedback
         
     except Exception as e:
+        import traceback
         print(f"Error generating final feedback: {e}")
+        print("TRACEBACK:", traceback.format_exc())
+        print("PROMPT TEXT:", prompt)
+        print("RESPONSE TEXT:", getattr(response, 'text', 'No response text available'))
         # Return fallback feedback with default 50/100 scores
         avg_score = 50
         if qa_list:

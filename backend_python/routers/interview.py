@@ -11,18 +11,20 @@ from models.schemas import (
     FinalFeedbackResponse
 )
 from services.ai_service import generate_questions, analyze_answer, generate_final_feedback
+from routers.auth import get_current_user
 import uuid
 
 router = APIRouter()
 
 @router.post("/start", response_model=InterviewSession)
-async def start_interview(request: InterviewStartRequest, db: Session = Depends(get_db)):
+async def start_interview(request: InterviewStartRequest, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
     questions = generate_questions(request.resume_text, request.type, request.difficulty)
     session_id = str(uuid.uuid4())
     
-    # Create Interview Record
+    # Create Interview Record linked to the user
     new_interview = Interview(
         id=session_id,
+        user_id=current_user.id,
         resume_id=request.resume_id, # Assuming passed or null
         type=request.type,
         difficulty=request.difficulty

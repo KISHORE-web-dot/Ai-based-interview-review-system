@@ -3,18 +3,19 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func
 import json
 from config.database import get_db
-from models.db_models import Interview, Feedback
+from models.db_models import Interview, Feedback, User
 from services.ai_service import generate_trend_analysis
+from routers.auth import get_current_user
 
 router = APIRouter()
 
 @router.get("/stats")
-async def get_dashboard_stats(db: Session = Depends(get_db)):
-    # Total Interviews
-    total_interviews = db.query(Interview).count()
+async def get_dashboard_stats(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    # Total Interviews for THIS authenticated user
+    total_interviews = db.query(Interview).filter(Interview.user_id == current_user.id).count()
     
-    # Get the Last 5 Feedbacks for a highly responsive moving average
-    recent_feedbacks = db.query(Feedback).order_by(Feedback.id.desc()).limit(5).all()
+    # Get the Last 5 Feedbacks for THIS user
+    recent_feedbacks = db.query(Feedback).join(Interview).filter(Interview.user_id == current_user.id).order_by(Feedback.id.desc()).limit(5).all()
     
     # Format response with auto-scaling (convert 0-10 to 0-100 percentage)
     def scale_score(score):
@@ -51,10 +52,10 @@ async def get_dashboard_stats(db: Session = Depends(get_db)):
     }
 
 @router.get("/analyze")
-async def analyze_dashboard_performance(db: Session = Depends(get_db)):
+async def analyze_dashboard_performance(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     """Fetch recent feedbacks and generate an AI agent summary of the user's performance."""
-    # Get last 4 feedbacks
-    recent_feedbacks = db.query(Feedback).order_by(Feedback.id.desc()).limit(4).all()
+    # Get last 4 feedbacks specific explicitly to the requested active user 
+    recent_feedbacks = db.query(Feedback).join(Interview).filter(Interview.user_id == current_user.id).order_by(Feedback.id.desc()).limit(4).all()
     
     if not recent_feedbacks:
         return {"analysis": "Take a few interviews first so I can analyze your unique strengths and growth!"}

@@ -20,6 +20,11 @@ const parseJsonResponse = async (response) => {
     return data;
 };
 
+const getAuthHeaders = (headers = {}) => {
+    const token = localStorage.getItem('token');
+    return token ? { 'Authorization': `Bearer ${token}`, ...headers } : headers;
+};
+
 export const api = {
     // Resume
     uploadResume: async (file) => {
@@ -29,6 +34,7 @@ export const api = {
         try {
             const response = await fetch(`${API_BASE_URL}/resume/upload`, {
                 method: 'POST',
+                headers: getAuthHeaders(),
                 body: formData,
             });
             return await parseJsonResponse(response);
@@ -44,7 +50,7 @@ export const api = {
         try {
             const response = await fetch(`${API_BASE_URL}/interview/start`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: headers: getAuthHeaders({ 'Content-Type': 'application/json' }),
                 body: JSON.stringify(data),
             });
             return await parseJsonResponse(response);
@@ -58,7 +64,7 @@ export const api = {
         try {
             const response = await fetch(`${API_BASE_URL}/interview/analyze-answer`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: headers: getAuthHeaders({ 'Content-Type': 'application/json' }),
                 body: JSON.stringify({ question, answer }),
             });
             return await parseJsonResponse(response);
@@ -72,7 +78,7 @@ export const api = {
         try {
             const response = await fetch(`${API_BASE_URL}/interview/end`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: headers: getAuthHeaders({ 'Content-Type': 'application/json' }),
                 body: JSON.stringify({ session_id: sessionId, qa_list, frames }),
             });
             return await parseJsonResponse(response);
@@ -111,6 +117,7 @@ export const api = {
         try {
             const response = await fetch(`${API_BASE_URL}/auth/token`, {
                 method: 'POST',
+                headers: getAuthHeaders(),
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
@@ -132,6 +139,7 @@ export const api = {
         try {
             const response = await fetch(`${API_BASE_URL}/auth/register`, {
                 method: 'POST',
+                headers: getAuthHeaders(),
                 headers: {
                     'Content-Type': 'application/json',
                 },

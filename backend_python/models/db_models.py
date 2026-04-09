@@ -7,11 +7,13 @@ class Interview(Base):
     __tablename__ = "interviews"
 
     id = Column(String(36), primary_key=True, index=True) # UUID
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=True) # Making it nullable so it doesn't crash existing nameless records
     resume_id = Column(String(36))
     type = Column(String(50))
     difficulty = Column(String(20))
     created_at = Column(DateTime, default=datetime.utcnow)
     
+    user = relationship("User", back_populates="interviews")
     feedback = relationship("Feedback", back_populates="interview", uselist=False)
 
 class Feedback(Base):
@@ -41,3 +43,5 @@ class User(Base):
     email = Column(String(100), unique=True, index=True)
     hashed_password = Column(String(255))
     created_at = Column(DateTime, default=datetime.utcnow)
+
+    interviews = relationship("Interview", back_populates="user")
