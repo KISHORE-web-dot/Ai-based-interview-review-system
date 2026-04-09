@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Dict, List, Optional
 
 class ResumeResponse(BaseModel):
@@ -6,11 +6,11 @@ class ResumeResponse(BaseModel):
     filename: str
 
 class InterviewStartRequest(BaseModel):
-    resume_text: str
-    resume_id: Optional[str] = None
-    type: str = "HR" # HR, Technical, Manager
-    difficulty: str = "Medium"
-    language: str = "English"
+    resume_text: str = Field(..., max_length=50000)
+    resume_id: Optional[str] = Field(None, max_length=36)
+    type: str = Field("HR", max_length=50) # HR, Technical, Manager
+    difficulty: str = Field("Medium", max_length=20)
+    language: str = Field("English", max_length=50)
 
 class Question(BaseModel):
     id: int
@@ -23,8 +23,8 @@ class InterviewSession(BaseModel):
     questions: List[Question]
 
 class AnswerRequest(BaseModel):
-    question: str
-    answer: str
+    question: str = Field(..., max_length=5000)
+    answer: str = Field(..., max_length=15000)
 
 class FeedbackResponse(BaseModel):
     feedback: str
@@ -32,15 +32,15 @@ class FeedbackResponse(BaseModel):
     suggestions: List[str]
 
 class QA(BaseModel):
-    question: str
-    answer: str
+    question: str = Field(..., max_length=5000)
+    answer: str = Field(..., max_length=15000)
     analysis: Optional[dict] = None  # Optional analysis from AI
     
 
 class FinalFeedbackRequest(BaseModel):
-    session_id: str
-    qa_list: List[QA]
-    frames: Optional[List[str]] = []
+    session_id: str = Field(..., max_length=36)
+    qa_list: List[QA] = Field(..., max_length=50)
+    frames: Optional[List[str]] = Field([], max_length=100)
     
 class FinalFeedbackResponse(BaseModel):
     strengths: List[str]

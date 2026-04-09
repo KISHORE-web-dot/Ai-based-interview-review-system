@@ -1,8 +1,12 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 import os
 from dotenv import load_dotenv
+from slowapi import _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
+from config.rate_limit import limiter
 from routers import resume, interview, stats, auth
 from config.database import engine, Base
 
@@ -13,6 +17,22 @@ Base.metadata.create_all(bind=engine)
 load_dotenv()
 
 app = FastAPI(title="AI Interview Backend", version="1.0.0")
+
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
+MAX_BODY_SIZE = 5 * 1024 * 1024  # 5 MB limit
+
+@app.middleware("http")
+async def limit_upload_size(request: Request, call_next):
+    if request.method in ["POST", "PUT", "PATCH"]:
+        content_length = request.headers.get("content-length")
+        if content_length and int(content_length) > MAX_BODY_SIZE:
+            return JSONResponse(
+                status_code=413,
+                content={"detail": f"Payload Too Large. Maximum allowed size is {MAX_BODY_SIZE / (1024 * 1024)}MB"}
+            )
+    return await call_next(request)
 
 # CORS Configuration
 origins = [

@@ -50,7 +50,7 @@ export const api = {
         try {
             const response = await fetch(`${API_BASE_URL}/interview/start`, {
                 method: 'POST',
-                headers: headers: getAuthHeaders({ 'Content-Type': 'application/json' }),
+                headers: getAuthHeaders({ 'Content-Type': 'application/json' }),
                 body: JSON.stringify(data),
             });
             return await parseJsonResponse(response);
@@ -64,7 +64,7 @@ export const api = {
         try {
             const response = await fetch(`${API_BASE_URL}/interview/analyze-answer`, {
                 method: 'POST',
-                headers: headers: getAuthHeaders({ 'Content-Type': 'application/json' }),
+                headers: getAuthHeaders({ 'Content-Type': 'application/json' }),
                 body: JSON.stringify({ question, answer }),
             });
             return await parseJsonResponse(response);
@@ -78,7 +78,7 @@ export const api = {
         try {
             const response = await fetch(`${API_BASE_URL}/interview/end`, {
                 method: 'POST',
-                headers: headers: getAuthHeaders({ 'Content-Type': 'application/json' }),
+                headers: getAuthHeaders({ 'Content-Type': 'application/json' }),
                 body: JSON.stringify({ session_id: sessionId, qa_list, frames }),
             });
             return await parseJsonResponse(response);

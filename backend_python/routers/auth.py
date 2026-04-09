@@ -1,19 +1,22 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Request
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from datetime import datetime, timedelta
 from typing import Optional
 from jose import JWTError, jwt
 from passlib.context import CryptContext
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr, Field
 import os
 from config.database import get_db
 from models.db_models import User
+from config.rate_limit import limiter
 
 router = APIRouter()
 
 # Security Config
-SECRET_KEY = os.getenv("SECRET_KEY", "your-secret-key-should-be-in-env")
+SECRET_KEY = os.getenv("SECRET_KEY")
+if not SECRET_KEY:
+    raise ValueError("SECRET_KEY must be set in the environment variables.")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
@@ -22,9 +25,9 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/auth/token")
 
 # Pydantic Schemas
 class UserCreate(BaseModel):
-    full_name: str
-    email: str
-    password: str
+    full_name: str = Field(..., max_length=100)
+    email: EmailStr = Field(..., max_length=100)
+    password: str = Field(..., min_length=8, max_length=100)
 
 class Token(BaseModel):
     access_token: str
@@ -69,7 +72,8 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db: Session = De
 
 # Routes
 @router.post("/register", response_model=Token)
-async def register(user: UserCreate, db: Session = Depends(get_db)):
+@limiter.limit("5/15minute")
+async def register(request: Request, user: UserCreate, db: Session = Depends(get_db)):
     # Check if user exists
     db_user = db.query(User).filter(User.email == user.email).first()
     if db_user:
@@ -95,7 +99,8 @@ async def register(user: UserCreate, db: Session = Depends(get_db)):
     return {"access_token": access_token, "token_type": "bearer", "user_name": new_user.full_name}
 
 @router.post("/token", response_model=Token)
-async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+@limiter.limit("5/15minute")
+async def login_for_access_token(request: Request, form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     # User authentication logic
     user = db.query(User).filter(User.email == form_data.username).first()
     if not user or not verify_password(form_data.password, user.hashed_password):

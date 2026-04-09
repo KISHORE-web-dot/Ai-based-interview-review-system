@@ -12,30 +12,32 @@ load_dotenv()
 
 def create_database():
     try:
-        # Hardcoded for the immediate user request/fix
-        # Note: In a robust app, we'd parse the env var properly or use separate env vars
-        # Installing pymysql is required
+        # Require DATABASE_URL instead of hardcoding
+        raw_url = os.getenv("DATABASE_URL")
+        if not raw_url:
+            raise ValueError("DATABASE_URL must be set in the environment variables.")
+            
+        # Extract engine_url from the full DATABASE_URL without the DB name
+        if raw_url.count('/') > 2:
+            parts = raw_url.rsplit('/', 1)
+            engine_url = parts[0]
+            db_name = parts[1]
+        else:
+            raise ValueError("Invalid DATABASE_URL format")
         
-        # User provided: root : root@1234
-        # We need to URL encode the password because it contains '@'
-        password = quote_plus("root@1234")
-        
-        # Connect to MySQL server (no specific DB)
-        # Using f-string for URL construction
-        engine_url = f"mysql+pymysql://root:{password}@localhost"
         
         # Create engine with echo=True for debugging
         engine = create_engine(engine_url, echo=True)
         
         with engine.connect() as conn:
             # Check if database exists
-            result = conn.execute(text("SHOW DATABASES LIKE 'interview_db'"))
+            result = conn.execute(text(f"SHOW DATABASES LIKE '{db_name}'"))
             if not result.fetchone():
-                print("Database 'interview_db' not found. Creating...")
-                conn.execute(text("CREATE DATABASE interview_db"))
-                print("Database 'interview_db' created successfully!")
+                print(f"Database '{db_name}' not found. Creating...")
+                conn.execute(text(f"CREATE DATABASE {db_name}"))
+                print(f"Database '{db_name}' created successfully!")
             else:
-                print("Database 'interview_db' already exists.")
+                print(f"Database '{db_name}' already exists.")
                 
     except Exception as e:
         print(f"Error creating database: {e}")
