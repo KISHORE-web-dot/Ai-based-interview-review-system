@@ -13,6 +13,23 @@ from config.database import engine, Base
 # Create Tables
 Base.metadata.create_all(bind=engine)
 
+# Safe migration: add user_id column to interviews if it doesn't exist
+def run_migrations():
+    from sqlalchemy import text, inspect
+    try:
+        with engine.begin() as conn:
+            inspector = inspect(engine)
+            existing_cols = [c['name'] for c in inspector.get_columns('interviews')]
+            if 'user_id' not in existing_cols:
+                conn.execute(text("ALTER TABLE interviews ADD COLUMN user_id INTEGER;"))
+                print("✅ Migration: user_id column added to interviews table.")
+            else:
+                print("✅ Migration: user_id column already exists, skipping.")
+    except Exception as e:
+        print(f"⚠️  Migration warning (non-fatal): {e}")
+
+run_migrations()
+
 # Load environment variables
 load_dotenv()
 
