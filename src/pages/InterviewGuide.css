@@ -243,3 +243,159 @@
     cursor: not-allowed;
     border: 2px dashed var(--border-dark);
 }
+
+/* ── Section wrapper ── */
+.guide-section {
+    margin-bottom: 2.5rem;
+}
+
+.guide-section-title {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.3rem;
+}
+
+.guide-section-sub {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin-bottom: 1.5rem;
+}
+
+/* ── How It Works Flow ── */
+.guide-flow {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+}
+
+.guide-flow-step {
+    flex: 1;
+    min-width: 140px;
+    text-align: center;
+    padding: 1.25rem 0.75rem;
+    background: var(--bg-primary);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.guide-flow-step:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-3px);
+}
+
+.guide-flow-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 0.6rem;
+}
+
+.guide-flow-num {
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-bottom: 0.25rem;
+}
+
+.guide-flow-label {
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 0.4rem;
+}
+
+.guide-flow-desc {
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    line-height: 1.45;
+    margin: 0;
+}
+
+.guide-flow-arrow {
+    font-size: 1.8rem;
+    color: var(--border-dark);
+    flex-shrink: 0;
+    margin-top: 1.8rem;
+    line-height: 1;
+}
+
+/* ── Score cards ── */
+.guide-scores {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+@media (min-width: 600px) {
+    .guide-scores {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+.guide-score-card {
+    background: var(--bg-primary);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.1rem;
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.guide-score-card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
+
+.guide-score-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.65rem;
+}
+
+.guide-score-label {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 0.35rem;
+}
+
+.guide-score-desc {
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    line-height: 1.45;
+    margin: 0;
+}
+
+.guide-feedback-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-radius: 10px;
+    padding: 0.85rem 1rem;
+    font-size: 0.86rem;
+    color: #1e40af;
+    line-height: 1.5;
+}
+
+.guide-feedback-note svg {
+    flex-shrink: 0;
+    margin-top: 2px;
+    color: #1e40af;
+}
+

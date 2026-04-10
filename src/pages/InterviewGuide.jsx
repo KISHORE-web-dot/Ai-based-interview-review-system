@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
     FileText, Mic, Monitor, Clock, CheckCircle,
-    ChevronRight, AlertCircle, Lightbulb, Wifi, Volume2
+    ChevronRight, AlertCircle, Lightbulb, Volume2,
+    Cpu, Star, BarChart2, MessageSquare, Award, RefreshCw
 } from 'lucide-react';
 import './InterviewGuide.css';
 
@@ -125,6 +126,58 @@ const InterviewGuide = () => {
                     If you skip any of these steps, your interview scores and transcript accuracy may be affected.
                     Especially ensure your <strong>microphone is working</strong> before continuing.
                 </span>
+            </div>
+
+            {/* How It Works */}
+            <div className="guide-section">
+                <h2 className="guide-section-title">How It Works</h2>
+                <p className="guide-section-sub">Your complete interview journey in 4 simple stages</p>
+                <div className="guide-flow">
+                    {[
+                        { icon: <FileText size={22} />, color: '#3b82f6', label: 'Upload Resume', desc: 'The AI reads your resume and tailors every question to your actual experience and skills.' },
+                        { icon: <Cpu size={22} />, color: '#8b5cf6', label: 'AI Generates Questions', desc: 'Gemini AI creates unique, role-specific questions based on your profile and chosen difficulty.' },
+                        { icon: <Mic size={22} />, color: '#10b981', label: 'You Answer Verbally', desc: 'Speak your answers aloud. Your browser transcribes them in real-time using speech recognition.' },
+                        { icon: <BarChart2 size={22} />, color: '#f59e0b', label: 'Get Detailed Feedback', desc: 'Click End Interview and receive a full performance report with scores, strengths, and next steps.' },
+                    ].map((item, i, arr) => (
+                        <React.Fragment key={i}>
+                            <div className="guide-flow-step">
+                                <div className="guide-flow-icon" style={{ color: item.color, background: `${item.color}18` }}>
+                                    {item.icon}
+                                </div>
+                                <div className="guide-flow-num">{i + 1}</div>
+                                <h4 className="guide-flow-label">{item.label}</h4>
+                                <p className="guide-flow-desc">{item.desc}</p>
+                            </div>
+                            {i < arr.length - 1 && <div className="guide-flow-arrow">›</div>}
+                        </React.Fragment>
+                    ))}
+                </div>
+            </div>
+
+            {/* How Feedback Works */}
+            <div className="guide-section">
+                <h2 className="guide-section-title">How Your Feedback Is Generated</h2>
+                <p className="guide-section-sub">After your session, the AI evaluates you across 4 key dimensions</p>
+                <div className="guide-scores">
+                    {[
+                        { icon: <Star size={20} />, color: '#3b82f6', label: 'Confidence', desc: 'How assertively and clearly you communicated your ideas without hesitation or filler words.' },
+                        { icon: <MessageSquare size={20} />, color: '#10b981', label: 'Communication', desc: 'Structure, clarity, and eloquence of your answers — including grammar and coherence.' },
+                        { icon: <Cpu size={20} />, color: '#8b5cf6', label: 'Technical Skills', desc: 'Accuracy and depth of your domain knowledge based on the role requirements in your resume.' },
+                        { icon: <RefreshCw size={20} />, color: '#ef4444', label: 'Stress Handling', desc: 'How well you handled unexpected or pressure-oriented questions without breaking composure.' },
+                    ].map((item, i) => (
+                        <div className="guide-score-card" key={i}>
+                            <div className="guide-score-icon" style={{ color: item.color, background: `${item.color}18` }}>
+                                {item.icon}
+                            </div>
+                            <h4 className="guide-score-label">{item.label}</h4>
+                            <p className="guide-score-desc">{item.desc}</p>
+                        </div>
+                    ))}
+                </div>
+                <div className="guide-feedback-note">
+                    <Award size={16} />
+                    <span>Each dimension is scored from <strong>0 to 100</strong>. You'll also receive a list of <strong>Strengths</strong>, <strong>Weaknesses</strong>, and <strong>Actionable Next Steps</strong> written specifically for you.</span>
+                </div>
             </div>
 
             {/* CTA */}
