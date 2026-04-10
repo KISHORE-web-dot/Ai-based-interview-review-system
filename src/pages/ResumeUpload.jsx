@@ -17,6 +17,7 @@ const ResumeUpload = () => {
     // New state for 2-step process
     const [step, setStep] = useState(1);
     const [uploadedText, setUploadedText] = useState('');
+    const [resumeWarning, setResumeWarning] = useState('');
     
     // Configuration State
     const [difficulty, setDifficulty] = useState('intermediate');
@@ -44,6 +45,11 @@ const ResumeUpload = () => {
             localStorage.setItem('resumeFilename', result.filename);
             
             setUploadedText(result.text);
+            if (!result.text || result.text.trim().length < 100) {
+                setResumeWarning('⚠️ We could only extract a small amount of text from your resume. It may be image-based or scanned. Questions might be less personalized — consider uploading a text-based PDF for best results.');
+            } else {
+                setResumeWarning('');
+            }
             setStep(2); // Move to configuration step
         } catch (err) {
             console.error('Upload failed:', err);
@@ -141,10 +147,16 @@ const ResumeUpload = () => {
                 </>
             ) : (
                 <div style={{ backgroundColor: 'var(--bg-primary)', padding: '2rem', borderRadius: '12px', border: '1px solid var(--border)' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--accent)', marginBottom: '1.5rem', justifyContent: 'center', fontWeight: '600' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--accent)', marginBottom: '1rem', justifyContent: 'center', fontWeight: '600' }}>
                         <CheckCircle size={24} />
                         Successfully Analyzed Resume
                     </div>
+
+                    {resumeWarning && (
+                        <div style={{ backgroundColor: 'rgba(255,180,0,0.1)', border: '1px solid rgba(255,180,0,0.4)', borderRadius: '8px', padding: '0.85rem 1rem', marginBottom: '1.25rem', color: '#f5a623', fontSize: '0.9rem', lineHeight: 1.5 }}>
+                            {resumeWarning}
+                        </div>
+                    )}
                     
                     <h3 style={{ marginBottom: '1rem', textAlign: 'center' }}>Step 2: Configure Interview</h3>
                     
