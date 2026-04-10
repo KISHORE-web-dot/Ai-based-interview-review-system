@@ -90,7 +90,9 @@ export const api = {
 
     getDashboardStats: async () => {
         try {
-            const response = await fetch(`${API_BASE_URL}/dashboard/stats`);
+            const response = await fetch(`${API_BASE_URL}/dashboard/stats`, {
+                headers: getAuthHeaders()
+            });
             return await parseJsonResponse(response);
         } catch (error) {
             console.error('API Error:', error);
@@ -100,7 +102,9 @@ export const api = {
 
     analyzeDashboardPerformance: async () => {
         try {
-            const response = await fetch(`${API_BASE_URL}/dashboard/analyze`);
+            const response = await fetch(`${API_BASE_URL}/dashboard/analyze`, {
+                headers: getAuthHeaders()
+            });
             return await parseJsonResponse(response);
         } catch (error) {
             console.error('API Error:', error);
@@ -117,7 +121,6 @@ export const api = {
         try {
             const response = await fetch(`${API_BASE_URL}/auth/token`, {
                 method: 'POST',
-                headers: getAuthHeaders(),
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
@@ -139,7 +142,6 @@ export const api = {
         try {
             const response = await fetch(`${API_BASE_URL}/auth/register`, {
                 method: 'POST',
-                headers: getAuthHeaders(),
                 headers: {
                     'Content-Type': 'application/json',
                 },
