@@ -180,9 +180,36 @@ def analyze_answer(question: str, answer: str) -> dict:
 
 def generate_final_feedback(qa_list: list) -> dict:
     """Generate comprehensive final feedback from all Q&A pairs"""
-    
+
+    # --- Early exit: no answers provided ---
+    answered = [qa for qa in qa_list if qa.get("answer", "").strip()]
+    if not answered:
+        return {
+            "strengths": [
+                "You showed up and started the interview"
+            ],
+            "weaknesses": [
+                "No answers were recorded — the microphone may not have picked up your voice",
+                "Without spoken responses, performance cannot be evaluated"
+            ],
+            "next_steps": [
+                "Make sure your microphone is enabled and working before starting",
+                "Use Google Chrome or Microsoft Edge for the best speech recognition support",
+                "Try speaking clearly and at a normal volume during the interview",
+                "Attempt another interview session once microphone access is confirmed"
+            ],
+            "scores": {
+                "Confidence": 0,
+                "Communication": 0,
+                "Technical Skills": 0,
+                "Stress Handling": 0
+            },
+            "overall_score": 0,
+            "detailed_analysis": "No answers were captured during this session. This usually happens when the microphone is muted, blocked, or the browser does not have permission to access it. Your scores have been set to 0 to reflect the absence of data. Please check your microphone settings and try again."
+        }
+
     # Extract just Q&A without analysis for cleaner prompt
-    qa_clean = [{"question": qa.get("question", ""), "answer": qa.get("answer", "")} for qa in qa_list]
+    qa_clean = [{"question": qa.get("question", ""), "answer": qa.get("answer", "")} for qa in answered]
     
     prompt = f"""
     Analyze this interview performance based on these Q&A pairs and provide detailed feedback:
@@ -239,23 +266,23 @@ def generate_final_feedback(qa_list: list) -> dict:
         print("TRACEBACK:", traceback.format_exc())
         print("PROMPT TEXT:", prompt)
         print("RESPONSE TEXT:", getattr(response, 'text', 'No response text available'))
-        # Return fallback feedback with default 50/100 scores
-        avg_score = 50
-        if qa_list:
-            # Try to calculate average from AI micro-analysis if available
+        # Return fallback feedback - use 0 if no answers, else try to estimate from micro-scores
+        answered_count = len([qa for qa in qa_list if qa.get("answer", "").strip()])
+        if answered_count == 0:
+            avg_score = 0
+        else:
+            avg_score = 50
             scores = [qa.get("analysis", {}).get("score", 5) for qa in qa_list if qa.get("analysis")]
             if scores:
-                # Assuming analysis returned score out of 10, scale to 100
                 avg_score = int((sum(scores) / len(scores)) * 10)
-        
+
         return {
             "strengths": [
-                "Attempted all questions",
-                "Showed willingness to participate"
-            ],
+                "You attempted to complete the interview session"
+            ] if answered_count > 0 else ["You showed up and started the interview"],
             "weaknesses": [
-                "Could provide more detailed responses",
-                "Practice articulating thoughts more clearly"
+                "The AI analysis encountered an error — scores may not be fully accurate",
+                "Consider retrying the interview for a more complete evaluation"
             ],
             "next_steps": [
                 "Review common interview questions and prepare structured answers",
@@ -269,7 +296,7 @@ def generate_final_feedback(qa_list: list) -> dict:
                 "Stress Handling": avg_score
             },
             "overall_score": avg_score,
-            "detailed_analysis": f"Based on {len(qa_list)} questions answered, you demonstrated basic competency. Focus on expanding your answers with specific examples and more technical depth to improve your performance."
+            "detailed_analysis": f"Based on {answered_count} answered question(s), an error occurred during AI analysis. Your estimated score is {avg_score}/100. Please try again for a full evaluation."
         }
 
 def analyze_body_language(frames_base64: list) -> dict:
