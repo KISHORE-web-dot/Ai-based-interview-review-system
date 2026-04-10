@@ -4,6 +4,7 @@ import Header from './components/Header';
 import ResumeUpload from './pages/ResumeUpload';
 import Dashboard from './pages/Dashboard';
 import InterviewSetup from './pages/InterviewSetup';
+import InterviewGuide from './pages/InterviewGuide';
 import LiveInterview from './pages/LiveInterview';
 import Feedback from './pages/Feedback';
 import Login from './pages/Login';
@@ -38,6 +39,12 @@ const App = () => {
                         <Route path="/" element={<Navigate to="/login" replace />} />
 
                         {/* Protected Routes */}
+                        <Route path="/guide" element={
+                            <ProtectedRoute>
+                                <InterviewGuide />
+                            </ProtectedRoute>
+                        } />
+
                         <Route path="/upload" element={
                             <ProtectedRoute>
                                 <ResumeUpload />

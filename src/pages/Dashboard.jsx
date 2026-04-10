@@ -70,11 +70,7 @@ const Dashboard = () => {
     ];
 
     const handleActionClick = (actionId) => {
-        if (actionId === 'upload') {
-            navigate('/upload');
-        } else {
-            navigate('/upload', { state: { interviewType: actionId } });
-        }
+        navigate('/guide', { state: { interviewType: actionId === 'upload' ? 'voice' : actionId } });
     };
 
     if (loading) {
