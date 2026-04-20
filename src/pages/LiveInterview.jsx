@@ -16,19 +16,22 @@ const LiveInterview = () => {
         voice: {
             interviewerCount: 1,
             silenceDuration: 2500,
+            absoluteSilenceTimeout: 5000,
             showTimer: false,
             interviewerLabel: 'single'
         },
         panel: {
             interviewerCount: 3,
             silenceDuration: 2500,
+            absoluteSilenceTimeout: 5000,
             showTimer: false,
             interviewerLabel: 'panel',
             rotateInterviewers: true
         },
         stress: {
             interviewerCount: 1,
-            silenceDuration: 1500, // Faster for stress
+            silenceDuration: 1500,
+            absoluteSilenceTimeout: 3000,
             showTimer: true,
             interviewerLabel: 'single',
             fastPaced: true
@@ -59,6 +62,7 @@ const LiveInterview = () => {
 
     const recognitionRef = useRef(null);
     const silenceTimerRef = useRef(null);
+    const absoluteSilenceTimerRef = useRef(null);
     const audioContextRef = useRef(null);
     const analyserRef = useRef(null);
     const animationFrameRef = useRef(null);
@@ -185,26 +189,41 @@ const LiveInterview = () => {
         }
     };
 
-    // Silence Detection Monitor
+    // Silence Detection Monitor (two-tier)
     useEffect(() => {
-        if (interviewState === 'LISTENING' && transcript.length >= MIN_ANSWER_LENGTH) {
+        if (silenceTimerRef.current) clearInterval(silenceTimerRef.current);
+        if (absoluteSilenceTimerRef.current) clearTimeout(absoluteSilenceTimerRef.current);
+
+        if (interviewState !== 'LISTENING') return;
+
+        // Tier 1: user spoke something - auto-submit after a pause
+        if (transcript.length >= MIN_ANSWER_LENGTH) {
             silenceTimerRef.current = setInterval(() => {
                 const silenceDuration = Date.now() - lastSpeechTimeRef.current;
-
                 if (silenceDuration >= config.silenceDuration) {
-                    console.log('Silence detected, auto-submitting...');
-                    setInterviewState('SILENCE_DETECTED');
+                    console.log('Silence after speech - auto-submitting...');
                     clearInterval(silenceTimerRef.current);
+                    clearTimeout(absoluteSilenceTimerRef.current);
+                    setInterviewState('SILENCE_DETECTED');
                     handleAutoSubmit();
                 }
-            }, 500); // Check every 500ms
-
-            return () => {
-                if (silenceTimerRef.current) {
-                    clearInterval(silenceTimerRef.current);
-                }
-            };
+            }, 500);
         }
+
+        // Tier 2: user said NOTHING at all - cycle mic after absoluteSilenceTimeout
+        absoluteSilenceTimerRef.current = setTimeout(() => {
+            if (transcript.trim().length === 0) {
+                console.log('Absolute silence - cycling mic...');
+                stopListening();
+                setTimeout(() => startListening(), 1200);
+            }
+        }, config.absoluteSilenceTimeout || 5000);
+
+        return () => {
+            if (silenceTimerRef.current) clearInterval(silenceTimerRef.current);
+            if (absoluteSilenceTimerRef.current) clearTimeout(absoluteSilenceTimerRef.current);
+        };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [interviewState, transcript]);
 
     // Timer
