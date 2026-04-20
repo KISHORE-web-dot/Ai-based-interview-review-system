@@ -239,6 +239,7 @@ def generate_final_feedback(qa_list: list) -> dict:
     - Write a detailed 2-3 sentence analysis
     """
     
+    response = None
     try:
         response = client.models.generate_content(
             model='models/gemini-2.5-flash', contents=prompt
@@ -265,7 +266,7 @@ def generate_final_feedback(qa_list: list) -> dict:
         print(f"Error generating final feedback: {e}")
         print("TRACEBACK:", traceback.format_exc())
         print("PROMPT TEXT:", prompt)
-        print("RESPONSE TEXT:", getattr(response, 'text', 'No response text available'))
+        print("RESPONSE TEXT:", getattr(response, 'text', 'No response text available') if response else 'Response was never assigned')
         # Return fallback feedback - use 0 if no answers, else try to estimate from micro-scores
         answered_count = len([qa for qa in qa_list if qa.get("answer", "").strip()])
         if answered_count == 0:
