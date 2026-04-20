@@ -4,6 +4,10 @@ from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 import os
 from dotenv import load_dotenv
+
+# Load environment variables early before importing routers
+load_dotenv(os.path.join(os.path.dirname(__file__), '.env'))
+
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from config.rate_limit import limiter
@@ -22,16 +26,13 @@ def run_migrations():
             existing_cols = [c['name'] for c in inspector.get_columns('interviews')]
             if 'user_id' not in existing_cols:
                 conn.execute(text("ALTER TABLE interviews ADD COLUMN user_id INTEGER;"))
-                print("✅ Migration: user_id column added to interviews table.")
+                print("[SUCCESS] Migration: user_id column added to interviews table.")
             else:
-                print("✅ Migration: user_id column already exists, skipping.")
+                print("[SUCCESS] Migration: user_id column already exists, skipping.")
     except Exception as e:
-        print(f"⚠️  Migration warning (non-fatal): {e}")
+        print(f"[WARNING] Migration warning (non-fatal): {e}")
 
 run_migrations()
-
-# Load environment variables
-load_dotenv()
 
 app = FastAPI(title="AI Interview Backend", version="1.0.0")
 
