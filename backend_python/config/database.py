@@ -8,7 +8,8 @@ load_dotenv()
 # Format: mysql+pymysql://user:password@host/db_name
 raw_url = os.getenv("DATABASE_URL")
 if not raw_url:
-    raise ValueError("DATABASE_URL must be set in the environment variables.")
+    print("⚠️  DATABASE_URL not set — falling back to local SQLite database.")
+    raw_url = "sqlite:///./interview_app.db"
 
 if raw_url.startswith("mysql://"):
     raw_url = raw_url.replace("mysql://", "mysql+pymysql://", 1)
