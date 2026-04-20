@@ -3,11 +3,23 @@ from sqlalchemy.orm import relationship
 from datetime import datetime
 from config.database import Base
 
+# User must be defined FIRST because Interview has a ForeignKey to users.id
+class User(Base):
+    __tablename__ = "users"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    full_name = Column(String(100))
+    email = Column(String(100), unique=True, index=True)
+    hashed_password = Column(String(255))
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    interviews = relationship("Interview", back_populates="user")
+
 class Interview(Base):
     __tablename__ = "interviews"
 
     id = Column(String(36), primary_key=True, index=True) # UUID
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=True) # Making it nullable so it doesn't crash existing nameless records
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
     resume_id = Column(String(36))
     type = Column(String(50))
     difficulty = Column(String(20))
@@ -34,14 +46,3 @@ class Feedback(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
     
     interview = relationship("Interview", back_populates="feedback")
-
-class User(Base):
-    __tablename__ = "users"
-    
-    id = Column(Integer, primary_key=True, index=True)
-    full_name = Column(String(100))
-    email = Column(String(100), unique=True, index=True)
-    hashed_password = Column(String(255))
-    created_at = Column(DateTime, default=datetime.utcnow)
-
-    interviews = relationship("Interview", back_populates="user")
